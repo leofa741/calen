@@ -1,10 +1,16 @@
 import React from 'react'
+import {BrowserRouter} from 'react-router-dom'
+import { AppRouter } from './router'
+
 
 const CalendarApp = () => {
   return (
-    <div>
-      
-    </div>
+    <BrowserRouter>
+    <AppRouter/>
+    
+    
+    
+    </BrowserRouter >
   )
 }
 
