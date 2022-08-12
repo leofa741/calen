@@ -6,8 +6,7 @@ import { AppRouter } from './router'
 const CalendarApp = () => {
   return (
     <BrowserRouter>
-    <AppRouter/>
-    
+    <AppRouter/> 
     
     
     </BrowserRouter >

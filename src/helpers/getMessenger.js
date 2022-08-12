@@ -2,7 +2,7 @@
 
 
 
-export const getMessengeres =() => {
+export const  getMessagesES =() => {
     return {
     allDay: 'Todo el día',
     previous: '<',
