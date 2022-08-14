@@ -1,3 +1,4 @@
+
 import { createSlice } from '@reduxjs/toolkit';
 
 export const uiSlice = createSlice({
@@ -18,3 +19,4 @@ export const uiSlice = createSlice({
 
 // Action creators are generated for each case reducer function
 export const { onOpenDateModal, onCloseDateModal } = uiSlice.actions;
+

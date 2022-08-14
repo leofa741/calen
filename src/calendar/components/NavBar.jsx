@@ -1,37 +1,21 @@
-import React from 'react'
+import * as React from 'react';
 import Button from '@mui/material/Button';
-import SendIcon from '@mui/icons-material/Send';
-import LogoutIcon from '@mui/icons-material/Logout'
+import LogoutIcon from '@mui/icons-material/Logout';
 
-
-
-export const NavBar = () => {
+export const Navbar = () => {
   return (
-
-    <div className="navbar navbar-dark bg-primary"  >
-      <span className="navbar-brand">
-        <i className="fas fa-calendar-alt" aria-hidden="true"></i>
-        &nbsp;My Calendar
+    <div className="navbar navbar-dark bg-dark mb-4 px-4">
+        <span className="navbar-brand">
+            <i className="fas fa-calendar-alt"></i>
+            &nbsp;
+            My Calendar
         </span>
 
-{/* <button className="btn btn-primary" onClick={() => {}}>
-
-    <i className="fas fa-sign-out-alt" aria-hidden="true"></i>
-    &nbsp;Logout
-
-    </button> */}
+      
 
 
-<Button variant="contained" endIcon={<LogoutIcon />}>
- Logout
-</Button>
-   
 
+        <Button variant="outlined"><LogoutIcon/></Button>
     </div>
-
-
-
-
-    
   )
 }

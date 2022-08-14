@@ -1,18 +1,15 @@
-import React from 'react'
-import {BrowserRouter} from 'react-router-dom'
-import { AppRouter } from './router'
-import { Provider } from 'react-redux'
-import { store } from './store'
+import { Provider } from 'react-redux';
+import { BrowserRouter } from 'react-router-dom';
+import { AppRouter } from './router';
+import { store } from './store';
 
 
-const CalendarApp = () => {
+export const CalendarApp = () => {
   return (
-    <Provider store={store}>
+    <Provider store={ store }>
       <BrowserRouter>
         <AppRouter />
-      </BrowserRouter >
+      </BrowserRouter>
     </Provider>
   )
 }
-
-export default CalendarApp

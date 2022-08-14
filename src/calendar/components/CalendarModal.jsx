@@ -1,18 +1,23 @@
-
-import Modal from 'react-modal'
-import { useMemo, useState } from 'react'
-import './Modal.css'
+import { useMemo, useState, useEffect } from 'react';
+import { addHours, differenceInSeconds } from 'date-fns';
 import Button from '@mui/material/Button';
-import CloseIcon  from '@mui/icons-material/Close';
-import { addHours } from 'date-fns';
-import DatePicker, {registerLocale}from "react-datepicker";
-import{es} from "date-fns/locale";
-import "react-datepicker/dist/react-datepicker.css";
-import Swal from 'sweetalert2'
-import 'sweetalert2/dist/sweetalert2.min.css'
+import Close from '@mui/icons-material/Close';
+
+import Swal from 'sweetalert2';
+import 'sweetalert2/dist/sweetalert2.min.css';
+
+import Modal from 'react-modal';
+import './Modal.css';
+
+import DatePicker, { registerLocale } from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
+
+import es from 'date-fns/locale/es';
+import { useCalendarStore, useUiStore } from '../../hooks';
 
 
-registerLocale('es', es);
+registerLocale( 'es', es );
+
 
 const customStyles = {
     content: {
@@ -23,165 +28,160 @@ const customStyles = {
       marginRight: '-50%',
       transform: 'translate(-50%, -50%)',
     },
-  };
+};
 
-  Modal.setAppElement('#root');
+Modal.setAppElement('#root');
 
 export const CalendarModal = () => {
 
+    const { isDateModalOpen, closeDateModal } = useUiStore();
+    const { activeEvent, startSavingEvent } = useCalendarStore();
 
-    const [isOpen, setIsOpen] = useState(true);
+    const [ formSubmitted, setFormSubmitted ] = useState(false);
 
     const [formValues, setFormValues] = useState({
-        title: 'leo',
-        notes: 'la nota',
+        title: '',
+        notes: '',
         start: new Date(),
-        end :addHours(new Date(), 1),
-    })
-    const [submitted, setSubmitted] = useState(false);
+        end: addHours( new Date(), 2),
+    });
 
-    const titleClass = useMemo(() => {   
-        return formValues.title.length  > 0  ? 'is-valid' : 'is-invalid';   
-    } , [ formValues.title]);
+    const titleClass = useMemo(() => {
+        if ( !formSubmitted ) return '';
 
+        return ( formValues.title.length > 0 )
+            ? ''
+            : 'is-invalid';
 
-    const notesClass = useMemo(() => {  
-      return formValues.notes.length  > 0  ? 'is-valid' : 'is-invalid';  
-  } , [ formValues.notes]);
- 
+    }, [ formValues.title, formSubmitted ])
+
+    useEffect(() => {
+      if ( activeEvent !== null ) {
+          setFormValues({ ...activeEvent });
+      }    
+      
+    }, [ activeEvent ])
     
-    const handleChange = (e) => {
+
+
+    const onInputChanged = ({ target }) => {
         setFormValues({
             ...formValues,
-            [e.target.name]: e.target.value
+            [target.name]: target.value
         })
     }
 
-    const handleDateChange = (e,changing) => {
+    const onDateChanged = ( event, changing ) => {
         setFormValues({
             ...formValues,
-            [changing]: e
+            [changing]: event
         })
     }
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setSubmitted(true);
-
-        const difference = formValues.end.getTime() - formValues.start.getTime();
-        const hours = Math.ceil(difference / (1000 * 60 * 60));
-
-        if (hours < 0) {            
-            Swal.fire('Error', 'La fecha de inicio no puede ser mayor a la fecha de fin', 'error')        
-
-         console.log(hours)
-           return
-             } 
-
-           if(formValues.title === '' || formValues.notes === ''){
-            Swal.fire('Error', 'Todos los campos son obligatorios', 'error')
-             console.log('error')
-               return
-                }
-
-                if(submitted){
-                    Swal.fire('Exito', 'Evento creado con exito', 'success')
-                    console.log('exito')
-                }           
-                          
-          console.log(hours)
-            console.log(formValues);
-          }
-  
-
-    const closeModal = () => {
-        setIsOpen(false)
+    const onCloseModal = () => {
+        closeDateModal();
     }
+
+    const onSubmit = async( event ) => {
+        event.preventDefault();
+        setFormSubmitted(true);
+
+        const difference = differenceInSeconds( formValues.end, formValues.start );
+        
+        if ( isNaN( difference ) || difference <= 0 ) {
+            Swal.fire('Fechas incorrectas','Revisar las fechas ingresadas','error');
+            return;
+        }
+        
+        if ( formValues.title.length <= 0 ) return;
+        
+        console.log(formValues);
+
+        // TODO: 
+        await startSavingEvent( formValues );
+        closeDateModal();
+        setFormSubmitted(false);
+    }
+
+
 
   return (
     <Modal
-        isOpen={isOpen}        
-        onRequestClose={closeModal}
-        style={customStyles}
-        closeTimeoutMS={200}
+        isOpen={ isDateModalOpen }
+        onRequestClose={ onCloseModal }
+        style={ customStyles }
         className="modal"
-        overlayClassName="modal-fondo"  
+        overlayClassName="modal-fondo"
+        closeTimeoutMS={ 200 }
     >
-        
-    
-<Button variant="contained" color="error" className='Button'   onClick={closeModal} endIcon={<CloseIcon />}>Close
-</Button>
+       <Button className='Button'   onClick={ onCloseModal } variant="outlined"><Close/></Button> <h1> Nuevo evento </h1> 
+        <hr />
+        <form className="container" onSubmit={ onSubmit }>
 
+            <div className="form-group mb-2">
+                <label>Fecha y hora inicio</label>
+                <DatePicker 
+                    selected={ formValues.start }
+                    onChange={ (event) => onDateChanged(event, 'start') }
+                    className="form-control"
+                    dateFormat="Pp"
+                    showTimeSelect
+                    locale="es"
+                    timeCaption="Hora"
+                />
+            </div>
 
-<h1> Nuevo evento </h1>
-<hr />
-<form className="container"  onSubmit={ handleSubmit } >
-    <div className="form-group mb-2">
-        <label>Fecha y hora inicio</label>
-        <DatePicker
-            selected={formValues.start}
-            onChange={(e) => handleDateChange(e, 'start')}
-            name="start"
-            className="form-control"
-            dateFormat="dd/MM/yyyy"
-            locale="es"          
-            placeholderText="Seleccione una fecha y hora"         
-            required
-        />
-    </div>
+            <div className="form-group mb-2">
+                <label>Fecha y hora fin</label>
+                <DatePicker 
+                    minDate={ formValues.start }
+                    selected={ formValues.end }
+                    onChange={ (event) => onDateChanged(event, 'end') }
+                    className="form-control"
+                    dateFormat="Pp"
+                    showTimeSelect
+                    locale="es"
+                    timeCaption="Hora"
+                />
+            </div>
 
-    <div className="form-group mb-2">
-        <label>Fecha y hora fin</label>
-        <DatePicker
-            selected={formValues.end}
-            minDate={formValues.start}
-            onChange={(e) => handleDateChange(e, 'end')}
-            name="end"
-            className="form-control"
-            dateFormat="dd/MM/yyyy"
-            locale="es"
-            placeholderText="Seleccione una fecha y hora"
-            required
-        />
-    </div>
+            <hr />
+            <div className="form-group mb-2">
+                <label>Titulo y notas</label>
+                <input 
+                    type="text" 
+                    className={ `form-control ${ titleClass }`}
+                    placeholder="Título del evento"
+                    name="title"
+                    autoComplete="off"
+                    value={ formValues.title }
+                    onChange={ onInputChanged }
+                />
+                <small id="emailHelp" className="form-text text-muted">Una descripción corta</small>
+            </div>
 
-    <hr />
-    <div className="form-group mb-2">
-        <label>Titulo y notas</label>
-        <input 
-            type="text" 
-            className={`form-control ${titleClass}`}
-            placeholder="Título del evento"
-            name="title"
-            autoComplete="off"
-            value={formValues.title}
-            onChange={handleChange}
-        />
-        <small id="emailHelp" className="form-text text-muted">Una descripción corta</small>
-    </div>
+            <div className="form-group mb-2">
+                <textarea 
+                    type="text" 
+                    className="form-control"
+                    placeholder="Notas"
+                    rows="5"
+                    name="notes"
+                    value={ formValues.notes }
+                    onChange={ onInputChanged }
+                ></textarea>
+                <small id="emailHelp" className="form-text text-muted">Información adicional</small>
+            </div>
 
-    <div className="form-group mb-2">
-        <textarea 
-            type="text" 
-            className={`form-control ${notesClass}`}
-            placeholder="Notas"
-            rows="5"
-            name="notes"
-            value={formValues.notes}  
-            onChange={handleChange}
-        ></textarea>
-        <small id="emailHelp" className="form-text text-muted">Información adicional</small>
-    </div>
+            <button
+                type="submit"
+                className="btn btn-outline-primary btn-block"
+            >
+                <i className="far fa-save"></i>
+                <span> Guardar</span>
+            </button>
 
-    <button
-        type="submit"
-        className="btn btn-outline-primary btn-block"
-    >
-        <i className="far fa-save"></i>
-        <span> Guardar</span>
-    </button>
-</form>
-
+        </form>
     </Modal>
   )
 }

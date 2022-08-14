@@ -1,27 +1,23 @@
-import React from 'react'
-import { Routes ,Route,Navigate} from 'react-router-dom'
-import { LoginPage } from '../auth'
-import { CalendarPage } from '../calendar'
+import { Navigate, Route, Routes } from 'react-router-dom';
+
+import { LoginPage } from '../auth';
+import { CalendarPage } from '../calendar';
+
 
 export const AppRouter = () => {
 
-const authStatus='authenticated'
-
-  return (
-
-    <Routes>
-
-{
-    (authStatus === 'not-authenticated') 
-    ? ( <Route path="/auth/*" element={<LoginPage />} /> )
-      : ( <Route path="/*" element={<CalendarPage />} /> )
-}
+    const authStatus = 'authenticated'; // 'authenticated'; // 'not-authenticated';
 
 
-  <Route path="/*" element={ <Navigate to="/auth/login"/>} />
+    return (
+        <Routes>
+            {
+                ( authStatus === 'not-authenticated')  
+                    ? <Route path="/auth/*" element={ <LoginPage /> } />
+                    : <Route path="/*" element={ <CalendarPage /> } />
+            }
 
-
-
-        </Routes>   
-  )
+            <Route path="/*" element={ <Navigate to="/auth/login" /> } />
+        </Routes>
+    )
 }

@@ -1,75 +1,57 @@
-import React, { useState } from 'react'
-import { Calendar} from 'react-big-calendar'
+import { useState } from 'react';
+import { Calendar } from 'react-big-calendar';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
 
-import{addHours} from 'date-fns'
+import { Navbar, CalendarEvent, CalendarModal, FabAddNew, FabDelete} from '../';
 
-import { NavBar ,CalendarEvent ,CalendarModal} from '../'
 import { localizer, getMessagesES } from '../../helpers';
-
-
-
-
+import { useUiStore, useCalendarStore } from '../../hooks';
 
 
 
 export const CalendarPage = () => {
 
-  const [lastView, setLastView] = useState(localStorage.getItem('lastView') || 'month')
+  const { openDateModal } = useUiStore();
+  const { events, setActiveEvent } = useCalendarStore();
 
-  const eventStyleGetter = (event, start, end, isSelected) => {    
-     const style = {
-       backgroundColor: '#f00',
-       borderRadius: '0px',
-       opacity: 0.8,
-       color: 'white',
-       display: 'block',
-    
-     }
-     return {
-       style: style,
-       className: 'calendar-event',
-     }
-   }
-   
+  const [ lastView, setLastView ] = useState(localStorage.getItem('lastView') || 'week' );
 
-   const events = [
-    {    
-      title: 'All Day Event very long',
-      allDay: true,
-      start: new Date(2022, 7, 6),
-      end: addHours(new Date(2022, 7, 7), 8),
-      description: 'moment.js is a library for parsing, validating, manipulating, and formatting dates.',
-      location: '',
-      id: '132',
-      user:{
-        id:'123',
-        name:'leo'
-  
-            }
-    }
-  ]
-  
- 
-     const DoubleClick = (event) => {
-  console.log({doubleClick:event})
+  const eventStyleGetter = ( event, start, end, isSelected ) => {
+
+    const style = {
+      backgroundColor: '#347CF7',
+      borderRadius: '0px',
+      opacity: 0.8,
+      color: 'white'
     }
 
-   const Select = (event) => {
-  console.log({click:event})
+    return {
+      style
     }
+  }
 
-  const View = (event) => {
+  const onDoubleClick = ( event ) => {
+    // console.log({ doubleClick: event });
+    openDateModal();
+  } 
+
+  const onSelect = ( event ) => {
+    // console.log({ click: event });
+    setActiveEvent( event );
+  }
+
+  const onViewChanged = ( event ) => {
     localStorage.setItem('lastView', event );
-    setLastView( event ) 
+    setLastView( event )
   }
 
 
-  return (
-    <>  
- <NavBar/>
 
- <Calendar
+  return (
+    <>
+      <Navbar />
+
+      <Calendar
         culture='es'
         localizer={ localizer }
         events={ events }
@@ -82,16 +64,18 @@ export const CalendarPage = () => {
         components={{
           event: CalendarEvent
         }}
-        onDoubleClickEvent={DoubleClick}
-        onSelectEvent={Select}
-        onView={View}
-      
+        onDoubleClickEvent={ onDoubleClick }
+        onSelectEvent={ onSelect }
+        onView={ onViewChanged }
       />
-<CalendarModal/>
 
 
- 
+      <CalendarModal />
+      
+      <FabAddNew />
+      <FabDelete />
 
-   </>
-     )
+
+    </>
+  )
 }
