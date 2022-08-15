@@ -19,7 +19,7 @@ import { useCalendarStore, useUiStore } from '../../hooks';
 registerLocale( 'es', es );
 
 
-const customStyles = {
+const customStyles = { 
     content: {
       top: '50%',
       left: '50%',
@@ -58,8 +58,7 @@ export const CalendarModal = () => {
     useEffect(() => {
       if ( activeEvent !== null ) {
           setFormValues({ ...activeEvent });
-      }    
-      
+      }          
     }, [ activeEvent ])
     
 
@@ -114,7 +113,7 @@ export const CalendarModal = () => {
         overlayClassName="modal-fondo"
         closeTimeoutMS={ 200 }
     >
-       <Button className='Button'   onClick={ onCloseModal } variant="outlined"><Close/></Button> <h1> Nuevo evento </h1> 
+       <Button className='Button' onClick={ onCloseModal } variant="outlined"><Close/></Button> <h1> Nuevo evento </h1> 
         <hr />
         <form className="container" onSubmit={ onSubmit }>
 
