@@ -10,7 +10,7 @@ const tempEvent =   {
     bgColor: '#fafafa',
     user: {
       _id: '123',
-      name: 'leo'
+      name: 'Fernando'
     }
 };
 
@@ -21,7 +21,7 @@ export const calendarSlice = createSlice({
         events: [
             tempEvent
         ],
-        activeEvent: null 
+        activeEvent: null
     },
     reducers: {
         onSetActiveEvent: ( state, { payload }) => {
